@@ -3,6 +3,8 @@ package com.mobile360.healthcare.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.ui.graphics.Color
 
 private val LightColors = lightColorScheme(
     primary = AppColors.primary,
@@ -43,11 +45,36 @@ private val LightColors = lightColorScheme(
 )
 
 @Composable
-fun CareConnectTheme(content: @Composable () -> Unit) {
+fun CareConnectTheme(darkTheme: Boolean = false, content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = LightColors,
+        colorScheme = if (darkTheme) CareConnectDarkColors else LightColors,
         typography = AppTypography,
         shapes = AppShapes,
         content = content
     )
 }
+
+// CR-002: dark colour scheme
+private val CareConnectDarkColors = darkColorScheme(
+    primary = Color(0xFFB4C5FF),
+    onPrimary = Color(0xFF00296E),
+    primaryContainer = Color(0xFF1D3E8F),
+    onPrimaryContainer = Color(0xFFDAE2FF),
+    secondary = Color(0xFFB9C7E8),
+    onSecondary = Color(0xFF233048),
+    secondaryContainer = Color(0xFF394760),
+    onSecondaryContainer = Color(0xFFD6E3FF),
+    background = Color(0xFF121317),
+    onBackground = Color(0xFFE3E2E9),
+    surface = Color(0xFF121317),
+    onSurface = Color(0xFFE3E2E9),
+    surfaceVariant = Color(0xFF44474F),
+    onSurfaceVariant = Color(0xFFC4C6D0),
+    outline = Color(0xFF8E909A),
+    outlineVariant = Color(0xFF44474F),
+    surfaceContainer = Color(0xFF1F2024),
+    surfaceContainerLow = Color(0xFF1A1B20),
+    surfaceContainerLowest = Color(0xFF0D0E12),
+    surfaceContainerHigh = Color(0xFF292A2F),
+    surfaceContainerHighest = Color(0xFF34353A)
+)

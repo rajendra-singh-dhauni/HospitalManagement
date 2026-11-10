@@ -45,6 +45,10 @@ interface AccountRepository {
     suspend fun changeNumber(newPhone: String, code: String): Outcome
     suspend fun signOutOtherDevices(): Outcome
     suspend fun deleteAccount(code: String): Outcome
+
+        // CR-002: light/dark theme preference
+        val darkTheme: Flow<Boolean> get() = kotlinx.coroutines.flow.flowOf(false)
+        suspend fun setDarkTheme(enabled: Boolean) {}
 }
 
 interface DoctorRepository {

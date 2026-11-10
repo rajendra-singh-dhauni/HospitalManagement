@@ -23,6 +23,14 @@ import com.mobile360.healthcare.navigation.MainViewModel
 import com.mobile360.healthcare.navigation.Routes
 import com.mobile360.healthcare.ui.theme.CareConnectTheme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mobile360.healthcare.data.AccountRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
@@ -30,7 +38,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CareConnectTheme { AppRoot() }
+            CareConnectTheme(darkTheme = hiltViewModel<ThemeViewModel>().darkTheme.collectAsStateWithLifecycle().value) { AppRoot() }
         }
     }
 }
@@ -49,4 +57,11 @@ fun AppRoot(viewModel: MainViewModel = hiltViewModel()) {
             }
         }
     }
+}
+
+// CR-002: exposes the stored theme choice; separate from MainViewModel so its constructor stays unchanged
+@HiltViewModel
+class ThemeViewModel @Inject constructor(account: AccountRepository) : ViewModel() {
+    val darkTheme: StateFlow<Boolean> =
+        account.darkTheme.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 }

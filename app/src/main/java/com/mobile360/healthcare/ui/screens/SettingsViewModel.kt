@@ -36,4 +36,18 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun report(text: String) { error.value = text }
+
+        // CR-002: dark theme preference; the switch follows the stored value, so a failed save leaves it unchanged
+        val darkTheme: StateFlow<Boolean> =
+            account.darkTheme.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+        fun setDarkTheme(enabled: Boolean) {
+            viewModelScope.launch {
+                try {
+                    account.setDarkTheme(enabled)
+                } catch (e: Exception) {
+                    report("Could not save this preference. Try again.")
+                }
+            }
+        }
 }

@@ -48,6 +48,7 @@ import com.mobile360.healthcare.data.model.AlertKind
 import com.mobile360.healthcare.data.model.Role
 
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.filled.DarkMode
 private const val SUPPORT_NUMBER = "1800123456"
 
 @Composable
@@ -149,6 +150,14 @@ fun SettingsScreen(
                 ToggleRow(Icons.Filled.UploadFile, "Reports and messages", "Lab reports & care team chats", prefs.reportsAndMessages) { viewModel.setAlert(AlertKind.REPORTS_AND_MESSAGES, it) }
             }
 
+            // CR-002: appearance section
+            SectionLabel("Appearance")
+            ToggleRow(
+                Icons.Filled.DarkMode,
+                "Dark mode",
+                "Use the dark colour scheme",
+                viewModel.darkTheme.collectAsStateWithLifecycle().value
+            ) { viewModel.setDarkTheme(it) }
             SectionLabel("Account Privacy")
             Card(colors = CardDefaults.cardColors(containerColor = scheme.surfaceContainerLowest), shape = MaterialTheme.shapes.large) {
                 LinkRow(Icons.Filled.Shield, "Security and account", "Device safety, mobile number, account security", onOpenSecurityAndAccount)
