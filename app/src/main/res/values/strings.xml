@@ -10,4 +10,9 @@
     <string name="action_retry">Retry</string>
     <string name="offline_banner">You are offline. Showing saved data.</string>
     <string name="demo_hint">Local demo sign-in (no SMS or email is sent). Patient: 98765 43210. Doctor: 98765 00001. Code: 123456.</string>
+    <!-- CR-001: biometric sign-in texts -->
+    <string name="biometric_sign_in">Sign in with biometrics</string>
+    <string name="biometric_enable_title">Enable biometric sign-in</string>
+    <string name="biometric_sign_in_failed">Biometric sign-in failed. Use your phone number instead.</string>
+    <string name="biometric_unavailable">Set up a fingerprint, face or screen lock on this device to use biometric sign-in.</string>
 </resources>
