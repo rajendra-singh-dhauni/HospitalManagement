@@ -108,4 +108,11 @@ suspend fun clearSession() {
             it.remove(Keys.SIGNED_IN_AT)
         }
     }
+
+        // CR-002: device-local theme choice, kept outside clearSession so it survives sign-out
+        val darkTheme: Flow<Boolean> = ds.data.map { it[booleanPreferencesKey("dark_theme")] ?: false }
+
+        suspend fun saveDarkTheme(enabled: Boolean) {
+            ds.edit { it[booleanPreferencesKey("dark_theme")] = enabled }
+        }
 }

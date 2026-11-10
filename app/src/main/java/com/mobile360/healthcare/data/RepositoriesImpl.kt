@@ -177,6 +177,11 @@ class AccountRepositoryImpl @Inject constructor(
         store.clearSession()
         return Outcome.ok("Deletion request submitted. Local data was cleared.").also { store.clearBiometricAccountId() /* CR-001 */ }
     }
+
+        // CR-002
+        override val darkTheme: Flow<Boolean> = store.darkTheme
+
+        override suspend fun setDarkTheme(enabled: Boolean) = store.saveDarkTheme(enabled)
 }
 
 @Singleton
