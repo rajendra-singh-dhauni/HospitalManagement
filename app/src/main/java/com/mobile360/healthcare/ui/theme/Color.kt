@@ -60,3 +60,10 @@ object AppColors {
     val chipText = Color(0xFF56485B)
     val urgentAccent = Color(0xFF8F334C)
 }
+
+/** CR-002: dark-mode surface tokens. */
+object AppDarkColors {
+    val background = Color(0xFF10141A)
+    val surface = Color(0xFF181C22)
+    val onSurface = Color(0xFFE0E2EA)
+}
