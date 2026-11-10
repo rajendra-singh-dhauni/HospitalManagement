@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.asStateFlow
 
 data class SecurityMessage(val section: String, val text: String, val ok: Boolean)
 
@@ -56,4 +57,23 @@ class SecurityAndAccountViewModel @Inject constructor(
     }
 
     fun invalid(section: String, text: String) = _state.update { SecurityUi(message = SecurityMessage(section, text, false)) }
+
+    // CR-001: biometric opt-in
+    private val _biometricEnabled = MutableStateFlow(false)
+    val biometricEnabled: StateFlow<Boolean> = _biometricEnabled.asStateFlow()
+
+    init {
+        viewModelScope.launch { _biometricEnabled.value = auth.isBiometricEnrolled() }
+    }
+
+    fun enableBiometric() {
+        viewModelScope.launch { _biometricEnabled.value = auth.enableBiometric() }
+    }
+
+    fun disableBiometric() {
+        viewModelScope.launch {
+            auth.disableBiometric()
+            _biometricEnabled.value = false
+        }
+    }
 }

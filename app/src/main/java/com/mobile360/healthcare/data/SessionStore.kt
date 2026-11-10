@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.first
 
 private val Context.careDataStore by preferencesDataStore(name = "careconnect_session")
 
@@ -85,7 +86,19 @@ class SessionStore @Inject constructor(@ApplicationContext context: Context) {
         }
     }
 
-    suspend fun clearSession() {
+    // CR-001: kept outside clearSession so it survives sign-out
+suspend fun biometricAccountId(): String? =
+    ds.data.map { it[stringPreferencesKey("biometric_account_id")] }.first()
+
+suspend fun saveBiometricAccountId(id: String) {
+    ds.edit { it[stringPreferencesKey("biometric_account_id")] = id }
+}
+
+suspend fun clearBiometricAccountId() {
+    ds.edit { it.remove(stringPreferencesKey("biometric_account_id")) }
+}
+
+suspend fun clearSession() {
         ds.edit {
             it.remove(Keys.USER_ID)
             it.remove(Keys.NAME)
