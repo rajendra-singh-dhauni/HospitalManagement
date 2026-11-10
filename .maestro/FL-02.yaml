@@ -1,0 +1,17 @@
+appId: ${APP_ID}
+name: FL-02 Doctor sign-in
+# Generated from the wireframes (stories US-003, US-004).
+---
+- launchApp:
+    clearState: true
+# SCR-01 Welcome
+- assertVisible: "Welcome"
+- tapOn: "Continue with mobile number"
+# SCR-02 Phone entry
+- assertVisible: "Enter your mobile number"
+- tapOn: "Send code"
+# SCR-03 OTP entry
+- assertVisible: "Enter 6-digit code"
+- tapOn: "Doctor account: open Today"
+# SCR-11 Doctor schedule
+- assertVisible: "Doctor schedule"

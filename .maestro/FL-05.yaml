@@ -1,0 +1,11 @@
+appId: ${APP_ID}
+name: FL-05 Chat with doctor
+# Generated from the wireframes (stories US-018, US-019).
+---
+- launchApp:
+    clearState: true
+# SCR-07 Appointments
+- assertVisible: "Appointments"
+- tapOn: "Message doctor"
+# SCR-10 Chat
+- assertVisible: "Chat"

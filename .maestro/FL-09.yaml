@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+name: FL-09 Settings and account
+# Generated from the wireframes (stories US-007, US-027, US-028, US-033, US-034, US-035).
+---
+- launchApp:
+    clearState: true
+# SCR-04 Patient Home
+- assertVisible: "Patient Home"
+- tapOn: "Profile and settings"
+# SCR-14 Settings
+- assertVisible: "Settings"
+- tapOn: "Security and account"
+# SCR-15 Security and account
+- assertVisible: "Security and account"

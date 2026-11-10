@@ -1,0 +1,11 @@
+appId: ${APP_ID}
+name: FL-08 Manage availability
+# Generated from the wireframes (stories US-015, US-038).
+---
+- launchApp:
+    clearState: true
+# SCR-11 Doctor schedule
+- assertVisible: "Doctor schedule"
+- tapOn: "Edit availability"
+# SCR-13 Availability
+- assertVisible: "Availability"

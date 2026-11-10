@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+name: FL-07 Doctor consultation
+# Generated from the wireframes (stories US-013, US-014, US-016, US-017).
+---
+- launchApp:
+    clearState: true
+# SCR-11 Doctor schedule
+- assertVisible: "Doctor schedule"
+- tapOn: "09:00 Priya Nair, Confirmed"
+# SCR-12 Consultation
+- assertVisible: "Consultation"
+- tapOn: "Open chat"
+# SCR-10 Chat
+- assertVisible: "Chat"

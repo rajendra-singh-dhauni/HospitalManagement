@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+name: FL-04 Reschedule or cancel appointment
+# Generated from the wireframes (stories US-011, US-012).
+---
+- launchApp:
+    clearState: true
+# SCR-07 Appointments
+- assertVisible: "Appointments"
+- tapOn: "Reschedule"
+# SCR-06 Doctor profile and booking
+- assertVisible: "Doctor profile and booking"
+- tapOn: "Confirm booking"
+# SCR-07 Appointments
+- assertVisible: "Appointments"

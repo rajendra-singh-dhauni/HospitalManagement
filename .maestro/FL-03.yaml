@@ -1,0 +1,17 @@
+appId: ${APP_ID}
+name: FL-03 Search doctor and book
+# Generated from the wireframes (stories US-008, US-009, US-010, US-042).
+---
+- launchApp:
+    clearState: true
+# SCR-04 Patient Home
+- assertVisible: "Patient Home"
+- tapOn: "Find a doctor"
+# SCR-05 Doctor search
+- assertVisible: "Doctor search"
+- tapOn: "Dr. Arun Rao, Cardiology, 4.8"
+# SCR-06 Doctor profile and booking
+- assertVisible: "Doctor profile and booking"
+- tapOn: "Confirm booking"
+# SCR-07 Appointments
+- assertVisible: "Appointments"

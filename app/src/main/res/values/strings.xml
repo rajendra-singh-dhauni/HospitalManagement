@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CareConnect</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_appointments">Appointments</string>
+    <string name="tab_records">Records</string>
+    <string name="tab_messages">Messages</string>
+    <string name="tab_profile">Profile</string>
+    <string name="action_back">Go back</string>
+    <string name="action_retry">Retry</string>
+    <string name="offline_banner">You are offline. Showing saved data.</string>
+    <string name="demo_hint">Local demo sign-in (no SMS or email is sent). Patient: 98765 43210. Doctor: 98765 00001. Code: 123456.</string>
+</resources>

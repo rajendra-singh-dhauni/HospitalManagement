@@ -1,0 +1,14 @@
+appId: ${APP_ID}
+name: FL-06 Prescriptions and history
+# Generated from the wireframes (stories US-020, US-021, US-022, US-023, US-032).
+---
+- launchApp:
+    clearState: true
+# SCR-04 Patient Home
+- assertVisible: "Patient Home"
+- tapOn: "My records"
+# SCR-08 Records
+- assertVisible: "Records"
+- tapOn: "Dr. Arun Rao, 08 Nov"
+# SCR-09 Prescription detail
+- assertVisible: "Prescription, 08 Nov"
