@@ -35,6 +35,13 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 import androidx.compose.runtime.saveable.rememberSaveable
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.compose.ui.platform.LocalContext
 private enum class Pending { NONE, DEVICES, PHONE, DELETE }
 
 @Composable
@@ -148,6 +155,9 @@ fun SecurityAndAccountScreen(
                             Text("Last sign-in: $lastSignIn", style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
                         }
                     }
+                    // CR-001: biometric opt-in
+                    val biometricEnabled by viewModel.biometricEnabled.collectAsStateWithLifecycle()
+                    BiometricToggleRow(biometricEnabled, viewModel::enableBiometric, viewModel::disableBiometric)
                     FilledTonalButton(onClick = { pending = Pending.DEVICES }, enabled = !ui.busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                         Icon(Icons.Filled.DevicesOther, null, Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
@@ -224,5 +234,61 @@ fun SecurityAndAccountScreen(
             if (ui.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
             Spacer(Modifier.height(16.dp))
         }
+    }
+}
+
+// CR-001: opt-in toggle; enabling asks for the biometric prompt first
+@Composable
+private fun BiometricToggleRow(enabled: Boolean, onEnable: () -> Unit, onDisable: () -> Unit) {
+    val context = LocalContext.current
+    var host: Context = context
+    while (host is ContextWrapper && host !is FragmentActivity) host = host.baseContext
+    val activity = host as? FragmentActivity
+    val authenticators = if (Build.VERSION.SDK_INT >= 30) {
+        BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+    } else {
+        BiometricManager.Authenticators.BIOMETRIC_STRONG
+    }
+    val available = remember {
+        BiometricManager.from(context).canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+    }
+    var message by remember { mutableStateOf<String?>(null) }
+    Column(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Sign in with biometrics", modifier = Modifier.weight(1f))
+            Switch(
+                checked = enabled,
+                enabled = available && activity != null,
+                onCheckedChange = { on ->
+                    if (!on) {
+                        message = null
+                        onDisable()
+                    } else if (activity != null) {
+                        val prompt = BiometricPrompt(
+                            activity,
+                            ContextCompat.getMainExecutor(activity),
+                            object : BiometricPrompt.AuthenticationCallback() {
+                                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                                    message = null
+                                    onEnable()
+                                }
+                                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                                    message = "Biometric sign-in was not enabled: $errString"
+                                }
+                            },
+                        )
+                        val builder = BiometricPrompt.PromptInfo.Builder()
+                            .setTitle("Enable biometric sign-in")
+                            .setAllowedAuthenticators(authenticators)
+                        if (Build.VERSION.SDK_INT < 30) builder.setNegativeButtonText("Cancel")
+                        prompt.authenticate(builder.build())
+                    }
+                },
+            )
+        }
+        if (!available) {
+            Text("Set up a fingerprint, face or screen lock on this device to use biometric sign-in.")
+        }
+        message?.let { Text(it) }
     }
 }

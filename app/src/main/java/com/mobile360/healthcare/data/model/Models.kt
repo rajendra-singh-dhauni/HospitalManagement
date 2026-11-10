@@ -74,3 +74,6 @@ object TimelineType {
     const val LABORATORY = "LABORATORY"
     const val APPOINTMENT = "APPOINTMENT"
 }
+
+// CR-001: outcome of restoring a session after a biometric check
+enum class BiometricSignInResult { SIGNED_IN, NOT_ENROLLED, ACCOUNT_MISSING }

@@ -106,7 +106,30 @@ class AuthRepositoryImpl @Inject constructor(
         return VerifyResult.Success(Role.valueOf(account.role))
     }
 
-    override suspend fun signOut() = store.clearSession()
+override suspend fun signOut() = store.clearSession()
+
+        // CR-001: biometric opt-in and session restore
+        override suspend fun isBiometricEnrolled(): Boolean = store.biometricAccountId() != null
+
+        override suspend fun enableBiometric(): Boolean {
+            val current = session.first() ?: return false
+            store.saveBiometricAccountId(current.userId)
+            return true
+        }
+
+        override suspend fun disableBiometric() = store.clearBiometricAccountId()
+
+        override suspend fun signInWithBiometric(): com.mobile360.healthcare.data.model.BiometricSignInResult {
+            val id = store.biometricAccountId()
+                ?: return com.mobile360.healthcare.data.model.BiometricSignInResult.NOT_ENROLLED
+            val account = dao.accountById(id)
+            if (account == null) {
+                store.clearBiometricAccountId()
+                return com.mobile360.healthcare.data.model.BiometricSignInResult.ACCOUNT_MISSING
+            }
+            store.save(account)
+            return com.mobile360.healthcare.data.model.BiometricSignInResult.SIGNED_IN
+        }
 }
 
 @Singleton
@@ -152,7 +175,7 @@ class AccountRepositoryImpl @Inject constructor(
             dao.deleteAccount(s.userId)
         }
         store.clearSession()
-        return Outcome.ok("Deletion request submitted. Local data was cleared.")
+        return Outcome.ok("Deletion request submitted. Local data was cleared.").also { store.clearBiometricAccountId() /* CR-001 */ }
     }
 }
 

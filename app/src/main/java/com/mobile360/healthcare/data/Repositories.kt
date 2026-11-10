@@ -20,6 +20,7 @@ import com.mobile360.healthcare.data.model.Session
 import com.mobile360.healthcare.data.model.VerifyResult
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import com.mobile360.healthcare.data.model.BiometricSignInResult
 
 // Every interface is backed by the local Room database seeded with sample data.
 // A real API source can replace an implementation through DI (RepositoryModule) without UI changes.
@@ -29,6 +30,12 @@ interface AuthRepository {
     suspend fun requestCode(phone: String): CodeRequestResult
     suspend fun verifyCode(code: String): VerifyResult
     suspend fun signOut()
+
+    // CR-001: biometric opt-in; defaults keep existing implementations compiling
+    suspend fun isBiometricEnrolled(): Boolean = false
+    suspend fun enableBiometric(): Boolean = false
+    suspend fun disableBiometric() {}
+    suspend fun signInWithBiometric(): BiometricSignInResult = BiometricSignInResult.NOT_ENROLLED
 }
 
 interface AccountRepository {

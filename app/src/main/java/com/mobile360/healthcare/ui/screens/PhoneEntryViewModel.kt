@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import com.mobile360.healthcare.data.model.BiometricSignInResult
 
 data class PhoneEntryState(val loading: Boolean = false, val error: String? = null)
 
@@ -55,4 +56,30 @@ class PhoneEntryViewModel @Inject constructor(
             }
         }
     }
+
+    // CR-001: biometric sign-in state; the prompt itself lives in the UI layer
+    private val _biometricEnrolled = MutableStateFlow(false)
+    val biometricEnrolled: StateFlow<Boolean> = _biometricEnrolled.asStateFlow()
+
+    init {
+        viewModelScope.launch { _biometricEnrolled.value = auth.isBiometricEnrolled() }
+    }
+
+    fun onBiometricSuccess(onSignedIn: () -> Unit) {
+        viewModelScope.launch {
+            when (auth.signInWithBiometric()) {
+                BiometricSignInResult.SIGNED_IN -> onSignedIn()
+                else -> {
+                    _biometricEnrolled.value = false
+                    _state.value = _state.value.copy(error = BIOMETRIC_FAILED)
+                }
+            }
+        }
+    }
+
+    fun onBiometricFailed() {
+        _state.value = _state.value.copy(error = BIOMETRIC_FAILED)
+    }
 }
+
+const val BIOMETRIC_FAILED = "Biometric sign-in failed. Use your phone number instead."

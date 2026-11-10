@@ -52,9 +52,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mobile360.healthcare.R
 import com.mobile360.healthcare.util.AppConfig
 import com.mobile360.healthcare.ui.theme.AppColors
+import android.content.Context
+import android.content.ContextWrapper
+import android.os.Build
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.remember
 
 @Composable
-fun PhoneEntryScreen(onOpenOTPEntry: () -> Unit, onBack: () -> Unit, viewModel: PhoneEntryViewModel = hiltViewModel()) {
+fun PhoneEntryScreen(onOpenOTPEntry: () -> Unit, onBack: () -> Unit, onSignedIn: () -> Unit = {},
+    viewModel: PhoneEntryViewModel = hiltViewModel()) {
     val phone by viewModel.phone.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { viewModel.issued.collect { onOpenOTPEntry() } }
@@ -151,7 +162,14 @@ fun PhoneEntryScreen(onOpenOTPEntry: () -> Unit, onBack: () -> Unit, viewModel: 
         Column(Modifier.fillMaxWidth().background(AppColors.surfaceContainerLowest).padding(horizontal = 16.dp, vertical = 12.dp)) {
             Text("We will send a one-time code. Doctors must be approved by admin.", style = MaterialTheme.typography.bodySmall, color = AppColors.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(12.dp))
-            Button(
+           // CR-001: biometric sign-in
+           val biometricEnrolled by viewModel.biometricEnrolled.collectAsStateWithLifecycle()
+           BiometricSignInButton(
+               enrolled = biometricEnrolled,
+               onSuccess = { viewModel.onBiometricSuccess(onSignedIn) },
+               onFailed = viewModel::onBiometricFailed,
+           )
+           Button(
                 onClick = viewModel::send,
                 enabled = !state.loading,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -168,4 +186,40 @@ fun PhoneEntryScreen(onOpenOTPEntry: () -> Unit, onBack: () -> Unit, viewModel: 
             }
         }
     }
+}
+
+// CR-001: biometric sign-in button, shown only when enrolled and the device can authenticate
+@Composable
+private fun BiometricSignInButton(enrolled: Boolean, onSuccess: () -> Unit, onFailed: () -> Unit) {
+    val context = LocalContext.current
+    var host: Context = context
+    while (host is ContextWrapper && host !is FragmentActivity) host = host.baseContext
+    val activity = host as? FragmentActivity ?: return
+    val authenticators = if (Build.VERSION.SDK_INT >= 30) {
+        BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+    } else {
+        BiometricManager.Authenticators.BIOMETRIC_STRONG
+    }
+    val available = remember(enrolled) {
+        BiometricManager.from(context).canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+    }
+    if (!enrolled || !available) return
+    OutlinedButton(
+        onClick = {
+            val prompt = BiometricPrompt(
+                activity,
+                ContextCompat.getMainExecutor(activity),
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onSuccess()
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onFailed()
+                },
+            )
+            val builder = BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Sign in with biometrics")
+                .setAllowedAuthenticators(authenticators)
+            if (Build.VERSION.SDK_INT < 30) builder.setNegativeButtonText("Use phone number")
+            prompt.authenticate(builder.build())
+        },
+        modifier = Modifier.fillMaxWidth(),
+    ) { Text("Sign in with biometrics") }
 }
